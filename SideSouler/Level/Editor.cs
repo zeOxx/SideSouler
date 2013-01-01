@@ -31,6 +31,8 @@ namespace SideSouler.Level
 
         private Level currentLevel;
 
+        private TileSheet tileSheet;
+
         public EditorCamera editorCamera;
 
         // TODO:
@@ -52,8 +54,8 @@ namespace SideSouler.Level
             currentLevel = new Level(new Vector2(100, 100), "");
             currentLevel.populateWithGrid(content);
 
-            Width   = 64 * 100;
-            Height  = 64 * 100;
+            Width   = 32 * 100;
+            Height  = 32 * 100;
 
             EditorCamera = new EditorCamera(view, Width, Height, 1.0f);
 
@@ -70,6 +72,8 @@ namespace SideSouler.Level
 
             Cursor = content.Load<Texture2D>("Editor\\cursorNormal");
             CursorPosition = Vector2.Zero;
+
+            tileSheet = new TileSheet(content.Load<Texture2D>("Env\\devTileSheet"), 256, 32, 32);
         }
         #endregion
 

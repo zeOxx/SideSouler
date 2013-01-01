@@ -13,23 +13,25 @@ namespace SideSouler.Level
     {
         #region Fields
         public Vector2 position;
+        public bool poisitionSet;
 
+        private Rectangle   sourceRectangle;
         private Texture2D   texture;
         private Vector2     origin;
         private bool        solid;
         private bool        interactable;
-        private int         type;               // Contains value from enumerator in (INSERT CLASS HERE)
         #endregion
 
         #region Constructor
-        public Tile(Texture2D texture, Vector2 position, bool solid, bool interactable, int type)
+        public Tile(Texture2D texture, Rectangle sourceRectangle, bool solid, bool interactable)
         {
             Texture         = texture;
-            Position        = position;
+            SourceRectangle = sourceRectangle;
             Solid           = solid;
             Interactable    = interactable;
-            Type            = type;
             Origin          = Vector2.Zero;
+
+            PoisitionSet = false;
         }
         #endregion
 
@@ -39,7 +41,19 @@ namespace SideSouler.Level
             get { return this.position; }
             private set { this.position = value; }
         }
-        
+
+        public bool PoisitionSet
+        {
+            get { return this.poisitionSet; }
+            set { this.poisitionSet = value; }
+        }
+
+        private Rectangle SourceRectangle
+        {
+            get { return this.sourceRectangle; }
+            set { this.sourceRectangle = value; }
+        }
+
         private Texture2D Texture
         {
             get { return this.texture; }
@@ -63,18 +77,19 @@ namespace SideSouler.Level
             get { return this.interactable; }
             set { this.interactable = value; }
         }
-
-        private int Type
-        {
-            get { return this.type; }
-            set { this.type = value; }
-        }
         #endregion
 
         #region Methods
+        public void setPosition(Vector2 position)
+        {
+            Position = position;
+
+            PoisitionSet = true;
+        }
+
         public void draw(SpriteBatch spriteBatch, float alpha)
         {
-            spriteBatch.Draw(Texture, Position, Color.White * alpha);
+            spriteBatch.Draw(Texture, Position, SourceRectangle, Color.White * alpha);
         }
         #endregion
     }

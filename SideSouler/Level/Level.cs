@@ -13,16 +13,16 @@ namespace SideSouler.Level
     class Level
     {
         #region Fields
-        private Vector2     size;               // Size can ONLY be given as integers to the constructor.
-        private List<Vector2>     layerTwoPositions;
-        private List<Tile>  tilesLayerOne;      // Background layer
-        private List<Tile>  tilesLayerTwo;      // Player layer
-        private List<Tile>  tilesLayerThree;    // Foreground layer
-        private List<Tile>  tilesLayerGrid;
-        private int         currentTileOne;
-        private int         currentTileTwo;
-        private int         currentTileThree;
-        private String      levelName;          // The level name has the following structure: "(world)-(level)_(name)". Example: "1-3_Undead Parish"
+        private Vector2         size;               // Size can ONLY be given as integers to the constructor.
+        private List<Vector2>   layerTwoPositions;
+        private List<Tile>      tilesLayerOne;      // Background layer
+        private List<Tile>      tilesLayerTwo;      // Player layer
+        private List<Tile>      tilesLayerThree;    // Foreground layer
+        private List<Tile>      tilesLayerGrid;
+        private int             currentTileOne;
+        private int             currentTileTwo;
+        private int             currentTileThree;
+        private String          levelName;          // The level name has the following structure: "(world)-(level)_(name)". Example: "1-3_Undead Parish"
 
         //the rest is commented out for the time being, as it has yet to be implemented
         #region Commented out fields
@@ -115,50 +115,50 @@ namespace SideSouler.Level
         #region Tile placement and removal
         public void placeTile(Texture2D texture, Vector2 position, bool solid, bool interactable, int type, int layer)
         {
-            Tile tempTile;
+            //Tile tempTile;
 
-            switch (layer)
-            {
-                case 1:
-                    if (CurrentTileOne < (Size.X * Size.Y))
-                    {
-                        if (!positionCheck(position, TilesLayerOne))
-                        {
-                            tempTile = new Tile(texture, position, solid, interactable, type);
+            //switch (layer)
+            //{
+            //    case 1:
+            //        if (CurrentTileOne < (Size.X * Size.Y))
+            //        {
+            //            if (!positionCheck(position, TilesLayerOne))
+            //            {
+            //                tempTile = new Tile(texture, position, solid, interactable, type);
 
-                            TilesLayerOne.Add(tempTile);
+            //                TilesLayerOne.Add(tempTile);
 
-                            CurrentTileOne++;
-                        }
-                    }
-                    break;
-                case 2:
-                    if (CurrentTileTwo < (Size.X * Size.Y))
-                    {
-                        if (!positionCheck(position, TilesLayerTwo))
-                        {
-                            tempTile = new Tile(texture, position, solid, interactable, type);
+            //                CurrentTileOne++;
+            //            }
+            //        }
+            //        break;
+            //    case 2:
+            //        if (CurrentTileTwo < (Size.X * Size.Y))
+            //        {
+            //            if (!positionCheck(position, TilesLayerTwo))
+            //            {
+            //                tempTile = new Tile(texture, position, solid, interactable, type);
 
-                            TilesLayerTwo.Add(tempTile);
+            //                TilesLayerTwo.Add(tempTile);
 
-                            CurrentTileTwo++;
-                        }
-                    }
-                    break;
-                case 3:
-                    if (CurrentTileThree < (Size.X * Size.Y))
-                    {
-                        if (!positionCheck(position, TilesLayerThree))
-                        {
-                            tempTile = new Tile(texture, position, solid, interactable, type);
+            //                CurrentTileTwo++;
+            //            }
+            //        }
+            //        break;
+            //    case 3:
+            //        if (CurrentTileThree < (Size.X * Size.Y))
+            //        {
+            //            if (!positionCheck(position, TilesLayerThree))
+            //            {
+            //                tempTile = new Tile(texture, position, solid, interactable, type);
 
-                            TilesLayerThree.Add(tempTile);
+            //                TilesLayerThree.Add(tempTile);
 
-                            CurrentTileThree++;
-                        }
-                    }
-                    break;
-            }
+            //                CurrentTileThree++;
+            //            }
+            //        }
+            //        break;
+            //}
         }
 
         public void removeTileCheck(Vector2 position, int layer)
@@ -183,21 +183,28 @@ namespace SideSouler.Level
 
         public void populateWithGrid(ContentManager content)
         {
-            Texture2D texture = content.Load<Texture2D>("Editor\\gridTile64");
+            Texture2D texture = content.Load<Texture2D>("Env\\devTileSheet");
 
             Vector2 tilePosition = new Vector2(0, 0);
-            // generates a special fourth layer
+            Rectangle source;
+
             for (int i = 0; i < Size.Y; i++)
             {
                 tilePosition.X = 0;
+
                 for (int j = 0; j < Size.X; j++)
                 {
-                    Tile tempTile = new Tile(texture, tilePosition, false, false, 0);
-                    tilePosition.X += 64;
+                    source = new Rectangle(0, 0, 32, 32);
+
+                    Tile tempTile = new Tile(texture, source, true, true);
+                    tempTile.setPosition(tilePosition);
+
+                    tilePosition.X += 32;
 
                     TilesLayerGrid.Add(tempTile);
                 }
-                tilePosition.Y += 64;
+
+                tilePosition.Y += 32;
             }
         }
 
@@ -229,7 +236,7 @@ namespace SideSouler.Level
         {
             for (int i = 0; i < TilesLayerOne.Count; i++)
             {
-                if (TilesLayerOne[i] != null)
+                if (TilesLayerOne[i] != null || TilesLayerOne[i].PoisitionSet != false)
                     TilesLayerOne[i].draw(spriteBatch, alpha);
             }
         }
@@ -238,7 +245,7 @@ namespace SideSouler.Level
         {
             for (int i = 0; i < TilesLayerTwo.Count; i++)
             {
-                if (TilesLayerTwo[i] != null)
+                if (TilesLayerTwo[i] != null || TilesLayerOne[i].PoisitionSet != false)
                     TilesLayerTwo[i].draw(spriteBatch, alpha);
             }
         }
@@ -247,7 +254,7 @@ namespace SideSouler.Level
         {
             for (int i = 0; i < TilesLayerThree.Count; i++)
             {
-                if (TilesLayerThree[i] != null)
+                if (TilesLayerThree[i] != null || TilesLayerOne[i].PoisitionSet != false)
                     TilesLayerThree[i].draw(spriteBatch, alpha);
             }
         }
@@ -256,7 +263,7 @@ namespace SideSouler.Level
         {
             for (int i = 0; i < TilesLayerGrid.Count; i++)
             {
-                if (TilesLayerGrid[i] != null)
+                if (TilesLayerGrid[i] != null || TilesLayerOne[i].PoisitionSet != false)
                     TilesLayerGrid[i].draw(spriteBatch, alpha);
             }
         }

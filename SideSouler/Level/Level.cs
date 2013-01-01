@@ -183,7 +183,7 @@ namespace SideSouler.Level
 
         public void populateWithGrid(ContentManager content)
         {
-            Texture2D texture = content.Load<Texture2D>("Env\\devTileSheet");
+            Texture2D texture = content.Load<Texture2D>("Env\\Dev\\devTileSheet");
 
             Vector2 tilePosition = new Vector2(0, 0);
             Rectangle source;

@@ -13,10 +13,10 @@ namespace SideSouler.Level
     class TileSheet
     {
         #region Fields
-        private Texture2D texture;
+        public int sheetWidth;
+        public int sheetHeight;
 
-        private int sheetWidth;
-        private int sheetHeight;
+        private Texture2D texture;
         private int tileSize;
 
         private Rectangle sourceRectangle;
@@ -33,22 +33,22 @@ namespace SideSouler.Level
         #endregion
 
         #region Accessors
-        private Texture2D Texture
-        {
-            get { return this.texture; }
-            set { this.texture = value; }
-        }
-
-        private int SheetWidth
+        public int SheetWidth
         {
             get { return this.sheetWidth; }
             set { this.sheetWidth = value; }
         }
 
-        private int SheetHeight
+        public int SheetHeight
         {
             get { return this.sheetHeight; }
             set { this.sheetHeight = value; }
+        }
+
+        private Texture2D Texture
+        {
+            get { return this.texture; }
+            set { this.texture = value; }
         }
 
         private int TileSize

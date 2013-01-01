@@ -13,8 +13,8 @@ namespace SideSouler.Interface
         #region Fields
         public int width;
         public int height;
+        public Vector2 position;
 
-        private Vector2 position;
         private int duration;       // In milliseconds
         private int fadeDuration;   // Also in millis
 
@@ -83,7 +83,7 @@ namespace SideSouler.Interface
             set { this.height = value; }
         }
 
-        private Vector2 Position
+        public Vector2 Position
         {
             get { return this.position; }
             set { this.position = value; }

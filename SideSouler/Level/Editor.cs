@@ -25,13 +25,14 @@ namespace SideSouler.Level
         private DialogBox topBox;
         private DialogBox rightBox;
         private DialogBox modeBox;
+        private DialogBox coordBox;
 
         private Texture2D cursor;
         private Vector2 cursorPosition;
 
         private Level currentLevel;
 
-        private TileSheet tileSheet;
+        private TileSheet tilesheet;
 
         public EditorCamera editorCamera;
 
@@ -62,18 +63,12 @@ namespace SideSouler.Level
             Margin  = 2;     // MAGIC NUMBERS YAY
             Layer   = 2;
 
-            ModeBox = new DialogBox(content, new Vector2(screenWidth / 2 - 100, screenHeight - 20), 128, 24, 0, 0, Margin);
-            ModeBox.setHeaderText("View Mode");
-
-            TopBox = new DialogBox(content, new Vector2(Margin, Margin), screenWidth - (Margin * 2), 25, 0, 0, Margin);
-            TopBox.setHeaderText("Editor   -   Layer: " + Layer);
-
-            RightBox = new DialogBox(content, new Vector2(screenWidth - 200, 30), 256, 687, 0, 0, Margin);
+            initDialogBoxes(content, screenWidth, screenHeight);
 
             Cursor = content.Load<Texture2D>("Editor\\cursorNormal");
             CursorPosition = Vector2.Zero;
 
-            tileSheet = new TileSheet(content.Load<Texture2D>("Env\\devTileSheet"), 256, 32, 32);
+            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32);
         }
         #endregion
 
@@ -120,6 +115,12 @@ namespace SideSouler.Level
             set { this.modeBox = value; }
         }
 
+        private DialogBox CoordBox
+        {
+            get { return this.coordBox; }
+            set { this.coordBox = value; }
+        }
+
         public Texture2D Cursor
         {
             get { return this.cursor; }
@@ -132,6 +133,12 @@ namespace SideSouler.Level
             set { this.cursorPosition = value; }
         }
 
+        public TileSheet Tilesheet
+        {
+            get { return this.tilesheet; }
+            set { this.tilesheet = value; }
+        }
+
         public EditorCamera EditorCamera
         {
             get { return this.editorCamera; }
@@ -140,6 +147,20 @@ namespace SideSouler.Level
         #endregion
 
         #region Methods
+        public void initDialogBoxes(ContentManager content, int screenWidth, int screenHeight)
+        {
+            ModeBox = new DialogBox(content, new Vector2(screenWidth / 2 - 100, screenHeight - 20), 128, 24, 0, 0, Margin);
+            ModeBox.setHeaderText("View Mode");
+
+            TopBox = new DialogBox(content, new Vector2(Margin, Margin), screenWidth - (Margin * 2), 25, 0, 0, Margin);
+            TopBox.setHeaderText("Editor   -   Layer: " + Layer);
+
+            RightBox = new DialogBox(content, new Vector2(screenWidth - 200, 30), 256, 687, 0, 0, Margin);
+
+            CoordBox = new DialogBox(content, Vector2.Zero, 128, 24, 0, 0, Margin);
+            CoordBox.setHeaderText("X: Y:");
+        }
+
         public void update(ContentManager content, InputHandler inputHandler)
         {
             /* Changing modes */
@@ -162,6 +183,8 @@ namespace SideSouler.Level
                 changeCursorTexture(content, false);
 
             CursorPosition = Vector2.Transform(inputHandler.mousePosition(), editorCamera.getInverseTransform());
+
+            CoordBox.setHeaderText("X: " + CursorPosition.X + " Y: " + CursorPosition.Y);
 
             updateHudPosition();
 
@@ -270,6 +293,9 @@ namespace SideSouler.Level
 
             ModeBox.update(new Vector2( editorCamera.Position.X - ((editorCamera.viewportWidth / 2) - Margin), 
                                         editorCamera.Position.Y + ((editorCamera.ViewportHeight / 2) - ((Margin * 2) + modeBox.Height))), Margin);
+
+            CoordBox.update(new Vector2(RightBox.Position.X - ((Margin * 2) + (CoordBox.Width)),
+                                        editorCamera.Position.Y + ((editorCamera.ViewportHeight / 2) - (CoordBox.Height + (Margin * 2)))), Margin);
         }
 
         public void draw(SpriteBatch spriteBatch)
@@ -316,6 +342,7 @@ namespace SideSouler.Level
             topBox.draw(spriteBatch);
             RightBox.draw(spriteBatch);
             ModeBox.draw(spriteBatch);
+            CoordBox.draw(spriteBatch);
 
             spriteBatch.Draw(Cursor, CursorPosition, Color.White);
         }

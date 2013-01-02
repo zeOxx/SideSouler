@@ -28,7 +28,9 @@ namespace SideSouler.Level
         private DialogBox coordBox;
 
         private Texture2D cursor;
+        private Texture2D hoverRect;
         private Vector2 cursorPosition;
+        private Vector2 cursorTilePosition;
 
         private Level currentLevel;
 
@@ -66,6 +68,7 @@ namespace SideSouler.Level
             initDialogBoxes(content, screenWidth, screenHeight);
 
             Cursor = content.Load<Texture2D>("Editor\\cursorNormal");
+            HoverRect = content.Load<Texture2D>("Editor\\hoverRect");
             CursorPosition = Vector2.Zero;
 
             Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32);
@@ -121,6 +124,12 @@ namespace SideSouler.Level
             set { this.coordBox = value; }
         }
 
+        public Texture2D HoverRect
+        {
+            get { return this.hoverRect; }
+            set { this.hoverRect = value; }
+        }
+
         public Texture2D Cursor
         {
             get { return this.cursor; }
@@ -131,6 +140,12 @@ namespace SideSouler.Level
         {
             get { return this.cursorPosition; }
             set { this.cursorPosition = value; }
+        }
+
+        public Vector2 CursorTilePosition
+        {
+            get { return this.cursorTilePosition; }
+            set { this.cursorTilePosition = value; }
         }
 
         public TileSheet Tilesheet
@@ -190,6 +205,14 @@ namespace SideSouler.Level
 
             if (mode == Modes.Edit)
             {
+                CursorTilePosition = inputHandler.mousePosition();
+                CursorTilePosition = Vector2.Transform(CursorTilePosition, editorCamera.getInverseTransform());
+
+                float overX = CursorTilePosition.X % 32;
+                float overY = CursorTilePosition.Y % 32;
+
+                CursorTilePosition -= new Vector2(overX, overY);
+
                 /* Editing tilemap */
                 if (clickOnHud(inputHandler.mousePosition()))
                 {
@@ -203,31 +226,13 @@ namespace SideSouler.Level
                     // Adding tiles:
                     if (inputHandler.leftClicked())
                     {
-                        Vector2 tilePosition = inputHandler.mousePosition();
-                        tilePosition = Vector2.Transform(tilePosition, editorCamera.getInverseTransform());
-
-                        float overX = tilePosition.X % 64;
-                        float overY = tilePosition.Y % 64;
-
-                        tilePosition.X -= overX;
-                        tilePosition.Y -= overY;
-
-                        currentLevel.placeTile(content.Load<Texture2D>("Env\\Dev\\devOrange"), tilePosition, false, false, 0, Layer);
+                        //currentLevel.placeTile(content.Load<Texture2D>("Env\\Dev\\devOrange"), CursorTilePosition, false, false, 0, Layer);
                     }
 
                     // Removing tiles:
                     if (inputHandler.rightClicked())
                     {
-                        Vector2 tilePosition = inputHandler.mousePosition();
-                        tilePosition = Vector2.Transform(tilePosition, editorCamera.getInverseTransform());
-
-                        float overX = tilePosition.X % 64;
-                        float overY = tilePosition.Y % 64;
-
-                        tilePosition.X -= overX;
-                        tilePosition.Y -= overY;
-
-                        currentLevel.removeTileCheck(tilePosition, Layer);
+                        //currentLevel.removeTileCheck(CursorTilePosition, Layer);
                     }
                     #endregion
                 }
@@ -328,6 +333,8 @@ namespace SideSouler.Level
                     currentLevel.drawGrid(spriteBatch, solid);
                 }
                 #endregion
+
+                spriteBatch.Draw(HoverRect, CursorTilePosition, Color.White * opaque);
             }
             else
             {

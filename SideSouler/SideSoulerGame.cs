@@ -23,6 +23,12 @@ namespace SideSouler
         int width = 1280;
         int height = 720;
 
+        // FPS and UPS
+        private int updates;
+        private int frames;
+        private float elapsed;
+        private float totalElapsed;
+
         public SideSoulerGame()
             : base()
         {
@@ -59,17 +65,32 @@ namespace SideSouler
 
         protected override void Update(GameTime gameTime)
         {
+            if (totalElapsed > 1)
+            {
+                Window.Title = gameName + " | " + frames + "FPS " + updates + "UPS";
+                totalElapsed = 0;
+                updates = 0;
+                frames = 0;
+            }
+
+            updates++;
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             inputHandler.update();
             editor.update(Content, inputHandler);
 
+            elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            totalElapsed += elapsed;
+
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
+            frames++;
+
             GraphicsDevice.Clear(Color.Gray);
 
             spriteBatch.Begin(SpriteSortMode.Deferred,

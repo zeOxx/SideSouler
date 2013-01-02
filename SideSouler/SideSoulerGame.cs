@@ -48,14 +48,16 @@ namespace SideSouler
             base.Initialize();
 
             IsMouseVisible = false;
-
-            editor = new Level.Editor(GraphicsDevice.Viewport, Content, width, height);
-            inputHandler = new Systems.InputHandler();
         }
 
         protected override void LoadContent()
         {
+            editor = new Level.Editor(GraphicsDevice.Viewport, Content, width, height);
+            inputHandler = new Systems.InputHandler();
+
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            editor.LoadContent(Content);
         }
 
         protected override void UnloadContent()

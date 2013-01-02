@@ -27,7 +27,9 @@ namespace SideSouler.Level
         private DialogBox modeBox;
         private DialogBox coordBox;
 
-        private Texture2D cursor;
+        private Texture2D cursorCurrent;
+        private Texture2D cursorMove;
+        private Texture2D cursorNormal;
         private Texture2D hoverRect;
         private Vector2 cursorPosition;
         private Vector2 cursorTilePosition;
@@ -67,11 +69,7 @@ namespace SideSouler.Level
 
             initDialogBoxes(content, screenWidth, screenHeight);
 
-            Cursor = content.Load<Texture2D>("Editor\\cursorNormal");
-            HoverRect = content.Load<Texture2D>("Editor\\hoverRect");
             CursorPosition = Vector2.Zero;
-
-            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32);
         }
         #endregion
 
@@ -130,10 +128,22 @@ namespace SideSouler.Level
             set { this.hoverRect = value; }
         }
 
-        public Texture2D Cursor
+        public Texture2D CursorCurrent
         {
-            get { return this.cursor; }
-            set { this.cursor = value; }
+            get { return this.cursorCurrent; }
+            set { this.cursorCurrent = value; }
+        }
+
+        public Texture2D CursorMove
+        {
+            get { return this.cursorMove; }
+            set { this.cursorMove = value; }
+        }
+
+        public Texture2D CursorNormal
+        {
+            get { return this.cursorNormal; }
+            set { this.cursorNormal = value; }
         }
 
         public Vector2 CursorPosition
@@ -162,6 +172,17 @@ namespace SideSouler.Level
         #endregion
 
         #region Methods
+        public void LoadContent(ContentManager content)
+        {
+            CursorMove = content.Load<Texture2D>("Editor\\cursorMoveCam");
+            CursorNormal = content.Load<Texture2D>("Editor\\cursorNormal");
+            CursorCurrent = CursorNormal;
+
+            HoverRect = content.Load<Texture2D>("Editor\\hoverRect");
+
+            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32);
+        }
+
         public void initDialogBoxes(ContentManager content, int screenWidth, int screenHeight)
         {
             ModeBox = new DialogBox(content, new Vector2(screenWidth / 2 - 100, screenHeight - 20), 128, 24, 0, 0, Margin);
@@ -270,9 +291,9 @@ namespace SideSouler.Level
         private void changeCursorTexture(ContentManager content, bool moving)
         {
             if (moving)
-                Cursor = content.Load<Texture2D>("Editor\\cursorMoveCam");
+                CursorCurrent = CursorMove;
             else
-                Cursor = content.Load<Texture2D>("Editor\\cursorNormal");
+                CursorCurrent = CursorNormal;
         }
 
         private void layerChecker(InputHandler inputHandler)
@@ -351,7 +372,7 @@ namespace SideSouler.Level
             ModeBox.draw(spriteBatch);
             CoordBox.draw(spriteBatch);
 
-            spriteBatch.Draw(Cursor, CursorPosition, Color.White);
+            spriteBatch.Draw(CursorCurrent, CursorPosition, Color.White);
         }
         #endregion
     }

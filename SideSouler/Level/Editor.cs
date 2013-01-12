@@ -39,7 +39,10 @@ namespace SideSouler.Level
 
         private TileSheet tilesheet;
         private Texture2D selectionRect;
+        private Vector2 selectionRectOffset;
         private Vector2 selectionRectPosition;
+        private Vector2 tileSelect;
+        private Tile selectedTile;
 
         public EditorCamera editorCamera;
 
@@ -74,7 +77,9 @@ namespace SideSouler.Level
 
             CursorPosition = Vector2.Zero;
 
-            TileText = new InfoText(content, "Tilesheet", new Vector2(400, -315));  // again, MAGIC NUMBERS!
+            TileText = new InfoText(content, "Tilesheet", new Vector2(370, -315));  // again, MAGIC NUMBERS!
+
+            SelectedTile = null;
         }
         #endregion
 
@@ -187,6 +192,18 @@ namespace SideSouler.Level
             set { this.selectionRectPosition = value; }
         }
 
+        private Vector2 TileSelect
+        {
+            get { return this.tileSelect; }
+            set { this.tileSelect = value; }
+        }
+
+        private Tile SelectedTile
+        {
+            get { return this.selectedTile; }
+            set { this.selectedTile = value; }
+        }
+
         public EditorCamera EditorCamera
         {
             get { return this.editorCamera; }
@@ -203,8 +220,10 @@ namespace SideSouler.Level
 
             HoverRect = content.Load<Texture2D>("Editor\\hoverRect");
 
-            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32, new Vector2(400, -290));
+            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32, new Vector2(370, -290));
             SelectionRect = content.Load<Texture2D>("Editor\\selectionRect");
+            SelectionRectPosition = new Vector2(370, -290);
+            TileSelect = Tilesheet.Position;
         }
 
         public void initDialogBoxes(ContentManager content, int screenWidth, int screenHeight)
@@ -215,7 +234,7 @@ namespace SideSouler.Level
             TopBox = new DialogBox(content, new Vector2(Margin, Margin), screenWidth - (Margin * 2), 25, 0, 0, Margin);
             TopBox.setHeaderText("Editor   -   Layer: " + Layer);
 
-            RightBox = new DialogBox(content, new Vector2(screenWidth - 200, 30), 256, 687, 0, 0, Margin);
+            RightBox = new DialogBox(content, new Vector2(screenWidth - 230, 30), 286, 687, 0, 0, Margin);
 
             CoordBox = new DialogBox(content, Vector2.Zero, 128, 24, 0, 0, Margin);
             CoordBox.setHeaderText("X: Y:");
@@ -264,19 +283,19 @@ namespace SideSouler.Level
                     #region Choosing tiles and other HUD stuff
                     if (inputHandler.leftClicked())
                     {
-                        // The tilesheet is located at (1040, 70).
-                        //  ((640 + 400), (360 - 290))
+                        // The tilesheet is located at (1010, 70).
+                        //  ((640 + 370), (360 - 290))
                         //  THERE ARE WAY TOO MANY NUMBERS HERE. 
                         //  GET THIS SHIT IN ORDER
-                        if (((inputHandler.mousePosition().X > 1040) && (inputHandler.mousePosition().X < (1040 + Tilesheet.SheetWidth)))
+                        if (((inputHandler.mousePosition().X > 1010) && (inputHandler.mousePosition().X < (1010 + Tilesheet.SheetWidth)))
                             && ((inputHandler.mousePosition().Y > 70) && (inputHandler.mousePosition().Y < (70 + Tilesheet.SheetHeight))))
                         {
-                            overX = inputHandler.mousePosition().X % 32;
-                            overY = inputHandler.mousePosition().Y % 32;
+                            tileSelect = new Vector2(   ((inputHandler.mousePosition().X - ((inputHandler.mousePosition().X - 1010) % 32)) - 1010), 
+                                                                ((inputHandler.mousePosition().Y - ((inputHandler.mousePosition().Y - 70) % 32)) - 70));
 
-                            Vector2 tileSelected = inputHandler.mousePosition() - new Vector2(overX, overY);
+                            SelectionRectPosition = Tilesheet.Position + tileSelect;
 
-                            Console.Out.WriteLine(tileSelected);
+                            SelectedTile = Tilesheet.getTile(((int)tileSelect.X / Tilesheet.TileSize), ((int)tileSelect.Y / Tilesheet.TileSize));
                         }
                     }
                     #endregion
@@ -287,13 +306,25 @@ namespace SideSouler.Level
                     // Adding tiles:
                     if (inputHandler.leftClicked())
                     {
-                        //currentLevel.placeTile(content.Load<Texture2D>("Env\\Dev\\devOrange"), CursorTilePosition, false, false, 0, Layer);
+                        if (SelectedTile != null)
+                        {
+                            SelectedTile.setPosition(CursorTilePosition);
+                            currentLevel.placeTile(SelectedTile, CursorTilePosition, Layer);
+                            Console.Out.WriteLine("placed!");
+
+                            SelectedTile = null;
+                        }
+
+                        if (SelectedTile == null)
+                        {
+                            SelectedTile = Tilesheet.getTile(((int)tileSelect.X / Tilesheet.TileSize), ((int)tileSelect.Y / Tilesheet.TileSize));
+                        }
                     }
 
                     // Removing tiles:
                     if (inputHandler.rightClicked())
                     {
-                        //currentLevel.removeTileCheck(CursorTilePosition, Layer);
+                        currentLevel.removeTileCheck(CursorTilePosition, Layer);
                     }
                     #endregion
                 }
@@ -366,6 +397,8 @@ namespace SideSouler.Level
             TileText.update(new Vector2(editorCamera.Position.X, editorCamera.Position.Y));
 
             Tilesheet.update(new Vector2(editorCamera.Position.X, editorCamera.Position.Y));
+
+            SelectionRectPosition = Tilesheet.Position + TileSelect;
         }
 
         public void draw(SpriteBatch spriteBatch)
@@ -418,9 +451,7 @@ namespace SideSouler.Level
             TileText.draw(spriteBatch);
             Tilesheet.draw(spriteBatch);
 
-            // Only draws the selectionRect if the position has been set.
-            if (SelectionRectPosition != null)
-                spriteBatch.Draw(SelectionRect, SelectionRectPosition, Color.White);
+            spriteBatch.Draw(SelectionRect, SelectionRectPosition, Color.White);
 
             spriteBatch.Draw(CursorCurrent, CursorPosition, Color.White);
         }

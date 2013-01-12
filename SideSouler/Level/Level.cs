@@ -113,52 +113,48 @@ namespace SideSouler.Level
         }
 
         #region Tile placement and removal
-        public void placeTile(Texture2D texture, Vector2 position, bool solid, bool interactable, int type, int layer)
+        public void placeTile(Tile tile, Vector2 position, int layer)
         {
-            //Tile tempTile;
+            Tile tempTile = tile;
 
-            //switch (layer)
-            //{
-            //    case 1:
-            //        if (CurrentTileOne < (Size.X * Size.Y))
-            //        {
-            //            if (!positionCheck(position, TilesLayerOne))
-            //            {
-            //                tempTile = new Tile(texture, position, solid, interactable, type);
+            switch (layer)
+            {
+                case 1:
+                    if (CurrentTileOne < (Size.X * Size.Y))
+                    {
+                        if (!positionCheck(position, TilesLayerOne))
+                        {
+                            TilesLayerOne.Add(tempTile);
 
-            //                TilesLayerOne.Add(tempTile);
+                            CurrentTileOne++;
+                        }
+                    }
+                    break;
+                case 2:
+                    if (CurrentTileTwo < (Size.X * Size.Y))
+                    {
+                        Console.Out.WriteLine(positionCheck(position, TilesLayerTwo));
+                        Console.Out.WriteLine(position);
+                        if (!positionCheck(position, TilesLayerTwo))
+                        {
+                            TilesLayerTwo.Add(tempTile);
 
-            //                CurrentTileOne++;
-            //            }
-            //        }
-            //        break;
-            //    case 2:
-            //        if (CurrentTileTwo < (Size.X * Size.Y))
-            //        {
-            //            if (!positionCheck(position, TilesLayerTwo))
-            //            {
-            //                tempTile = new Tile(texture, position, solid, interactable, type);
+                            CurrentTileTwo++;
+                        }
+                    }
+                    break;
+                case 3:
+                    if (CurrentTileThree < (Size.X * Size.Y))
+                    {
+                        if (!positionCheck(position, TilesLayerThree))
+                        {
+                            TilesLayerThree.Add(tempTile);
 
-            //                TilesLayerTwo.Add(tempTile);
-
-            //                CurrentTileTwo++;
-            //            }
-            //        }
-            //        break;
-            //    case 3:
-            //        if (CurrentTileThree < (Size.X * Size.Y))
-            //        {
-            //            if (!positionCheck(position, TilesLayerThree))
-            //            {
-            //                tempTile = new Tile(texture, position, solid, interactable, type);
-
-            //                TilesLayerThree.Add(tempTile);
-
-            //                CurrentTileThree++;
-            //            }
-            //        }
-            //        break;
-            //}
+                            CurrentTileThree++;
+                        }
+                    }
+                    break;
+            }
         }
 
         public void removeTileCheck(Vector2 position, int layer)

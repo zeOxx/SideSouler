@@ -22,7 +22,7 @@ namespace SideSouler.Level
         private Vector2 offset;
 
         private Texture2D texture;
-        private int tileSize;
+        public int tileSize;
 
         private Rectangle sourceRectangle;
         #endregion
@@ -32,7 +32,7 @@ namespace SideSouler.Level
         {
             Texture = sheet;
             SheetWidth = sheetWidth;
-            sheetWidth = sheetHeight;
+            SheetHeight = sheetHeight;
             TileSize = tileSize;
 
             Offset = offset;
@@ -43,19 +43,19 @@ namespace SideSouler.Level
         public int SheetWidth
         {
             get { return this.sheetWidth; }
-            set { this.sheetWidth = value; }
+            private set { this.sheetWidth = value; }
         }
 
         public int SheetHeight
         {
             get { return this.sheetHeight; }
-            set { this.sheetHeight = value; }
+            private set { this.sheetHeight = value; }
         }
 
-        private Vector2 Position
+        public Vector2 Position
         {
             get { return this.position; }
-            set { this.position = value; }
+            private set { this.position = value; }
         }
 
         private Vector2 Offset
@@ -70,10 +70,10 @@ namespace SideSouler.Level
             set { this.texture = value; }
         }
 
-        private int TileSize
+        public int TileSize
         {
             get { return this.tileSize; }
-            set { this.tileSize = value; }
+            private set { this.tileSize = value; }
         }
 
         private Rectangle SourceRectangle
@@ -94,7 +94,7 @@ namespace SideSouler.Level
         {
             Tile tile;
 
-            if (!((x * TileSize) > (SheetWidth / TileSize) || (y * TileSize) > (SheetHeight / TileSize)))
+            if (!(x > (SheetWidth / TileSize) || y > (SheetHeight / TileSize)))
             {
                 SourceRectangle = new Rectangle((x * TileSize), (y * TileSize), TileSize, TileSize);
 
@@ -109,7 +109,7 @@ namespace SideSouler.Level
         // Draw will ONLY be used when in the editor
         public void draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, position, Color.White);
+            spriteBatch.Draw(Texture, Position, Color.White);
         }
         #endregion
     }

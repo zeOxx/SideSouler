@@ -26,6 +26,7 @@ namespace SideSouler.Level
         private DialogBox rightBox;
         private DialogBox modeBox;
         private DialogBox coordBox;
+        private InfoText tileText;
 
         private Texture2D cursorCurrent;
         private Texture2D cursorMove;
@@ -37,11 +38,13 @@ namespace SideSouler.Level
         private Level currentLevel;
 
         private TileSheet tilesheet;
+        private Texture2D selectionRect;
+        private Vector2 selectionRectPosition;
 
         public EditorCamera editorCamera;
 
         // TODO:
-        //  Add object mode and particle mode, among other things (NPC Mode etc)
+        //  Add other modes (NPC Mode etc)
         private enum Modes
         {
             Edit,
@@ -70,6 +73,8 @@ namespace SideSouler.Level
             initDialogBoxes(content, screenWidth, screenHeight);
 
             CursorPosition = Vector2.Zero;
+
+            TileText = new InfoText(content, "Tilesheet", new Vector2(400, -315));  // again, MAGIC NUMBERS!
         }
         #endregion
 
@@ -122,6 +127,12 @@ namespace SideSouler.Level
             set { this.coordBox = value; }
         }
 
+        private InfoText TileText
+        {
+            get { return this.tileText; }
+            set { this.tileText = value; }
+        }
+
         public Texture2D HoverRect
         {
             get { return this.hoverRect; }
@@ -164,6 +175,18 @@ namespace SideSouler.Level
             set { this.tilesheet = value; }
         }
 
+        public Texture2D SelectionRect
+        {
+            get { return this.selectionRect; }
+            set { this.selectionRect = value; }
+        }
+
+        public Vector2 SelectionRectPosition
+        {
+            get { return this.selectionRectPosition; }
+            set { this.selectionRectPosition = value; }
+        }
+
         public EditorCamera EditorCamera
         {
             get { return this.editorCamera; }
@@ -180,7 +203,8 @@ namespace SideSouler.Level
 
             HoverRect = content.Load<Texture2D>("Editor\\hoverRect");
 
-            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32);
+            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32, new Vector2(400, -290));
+            SelectionRect = content.Load<Texture2D>("Editor\\selectionRect");
         }
 
         public void initDialogBoxes(ContentManager content, int screenWidth, int screenHeight)
@@ -238,7 +262,23 @@ namespace SideSouler.Level
                 if (clickOnHud(inputHandler.mousePosition()))
                 {
                     #region Choosing tiles and other HUD stuff
+                    if (inputHandler.leftClicked())
+                    {
+                        // The tilesheet is located at (1040, 70).
+                        //  ((640 + 400), (360 - 290))
+                        //  THERE ARE WAY TOO MANY NUMBERS HERE. 
+                        //  GET THIS SHIT IN ORDER
+                        if (((inputHandler.mousePosition().X > 1040) && (inputHandler.mousePosition().X < (1040 + Tilesheet.SheetWidth)))
+                            && ((inputHandler.mousePosition().Y > 70) && (inputHandler.mousePosition().Y < (70 + Tilesheet.SheetHeight))))
+                        {
+                            overX = inputHandler.mousePosition().X % 32;
+                            overY = inputHandler.mousePosition().Y % 32;
 
+                            Vector2 tileSelected = inputHandler.mousePosition() - new Vector2(overX, overY);
+
+                            Console.Out.WriteLine(tileSelected);
+                        }
+                    }
                     #endregion
                 }
                 else
@@ -322,6 +362,10 @@ namespace SideSouler.Level
 
             CoordBox.update(new Vector2(RightBox.Position.X - ((Margin * 2) + (CoordBox.Width)),
                                         editorCamera.Position.Y + ((editorCamera.ViewportHeight / 2) - (CoordBox.Height + (Margin * 2)))), Margin);
+
+            TileText.update(new Vector2(editorCamera.Position.X, editorCamera.Position.Y));
+
+            Tilesheet.update(new Vector2(editorCamera.Position.X, editorCamera.Position.Y));
         }
 
         public void draw(SpriteBatch spriteBatch)
@@ -363,7 +407,6 @@ namespace SideSouler.Level
                 currentLevel.drawLayerOne(spriteBatch, solid);
                 currentLevel.drawLayerTwo(spriteBatch, solid);
                 currentLevel.drawLayerThree(spriteBatch, solid);
-                currentLevel.drawGrid(spriteBatch, solid);
                 #endregion
             }
 
@@ -371,6 +414,13 @@ namespace SideSouler.Level
             RightBox.draw(spriteBatch);
             ModeBox.draw(spriteBatch);
             CoordBox.draw(spriteBatch);
+
+            TileText.draw(spriteBatch);
+            Tilesheet.draw(spriteBatch);
+
+            // Only draws the selectionRect if the position has been set.
+            if (SelectionRectPosition != null)
+                spriteBatch.Draw(SelectionRect, SelectionRectPosition, Color.White);
 
             spriteBatch.Draw(CursorCurrent, CursorPosition, Color.White);
         }

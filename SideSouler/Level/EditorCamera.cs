@@ -118,6 +118,11 @@ namespace SideSouler.Level
             Zoom += amount;
         }
 
+        public void resetZoom()
+        {
+            Zoom = 1.0f;
+        }
+
         public Matrix getTransformation()
         {
             Transform = Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *

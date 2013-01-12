@@ -16,6 +16,11 @@ namespace SideSouler.Level
         public int sheetWidth;
         public int sheetHeight;
 
+        // Position and Offset will ONLY be used when in the editor. It is used to display the tilesheet
+        //  so the user can see and select tiles from it.
+        private Vector2 position;
+        private Vector2 offset;
+
         private Texture2D texture;
         private int tileSize;
 
@@ -23,12 +28,14 @@ namespace SideSouler.Level
         #endregion
 
         #region Constructor
-        public TileSheet(Texture2D sheet, int sheetWidth, int sheetHeight, int tileSize)
+        public TileSheet(Texture2D sheet, int sheetWidth, int sheetHeight, int tileSize, Vector2 offset)
         {
             Texture = sheet;
             SheetWidth = sheetWidth;
             sheetWidth = sheetHeight;
             TileSize = tileSize;
+
+            Offset = offset;
         }
         #endregion
 
@@ -43,6 +50,18 @@ namespace SideSouler.Level
         {
             get { return this.sheetHeight; }
             set { this.sheetHeight = value; }
+        }
+
+        private Vector2 Position
+        {
+            get { return this.position; }
+            set { this.position = value; }
+        }
+
+        private Vector2 Offset
+        {
+            get { return this.offset; }
+            set { this.offset = value; }
         }
 
         private Texture2D Texture
@@ -65,6 +84,11 @@ namespace SideSouler.Level
         #endregion
 
         #region Methods
+        public void update(Vector2 cameraPosition)
+        {
+            Position = cameraPosition + Offset;
+        }
+
         // Method that returns a Tile in a specific location on the tilesheet
         public Tile getTile(int x, int y)
         {
@@ -80,6 +104,12 @@ namespace SideSouler.Level
             }
             else
                 return null;
+        }
+
+        // Draw will ONLY be used when in the editor
+        public void draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(Texture, position, Color.White);
         }
         #endregion
     }

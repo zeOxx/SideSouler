@@ -69,7 +69,7 @@ namespace SideSouler
         {
             if (totalElapsed > 1)
             {
-                Window.Title = gameName + " | " + frames + "FPS " + updates + "UPS";
+                Window.Title = gameName + " | " + frames + "FPS " + updates + "UPS ";
                 totalElapsed = 0;
                 updates = 0;
                 frames = 0;

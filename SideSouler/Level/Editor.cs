@@ -220,7 +220,7 @@ namespace SideSouler.Level
 
             HoverRect = content.Load<Texture2D>("Editor\\hoverRect");
 
-            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\Dev\\devTileSheet"), 256, 32, 32, new Vector2(370, -290));
+            Tilesheet = new TileSheet(content.Load<Texture2D>("Env\\tilesheet01"), 32, new Vector2(370, -290));
             SelectionRect = content.Load<Texture2D>("Editor\\selectionRect");
             SelectionRectPosition = new Vector2(370, -290);
             TileSelect = Tilesheet.Position;
@@ -310,7 +310,6 @@ namespace SideSouler.Level
                         {
                             SelectedTile.setPosition(CursorTilePosition);
                             currentLevel.placeTile(SelectedTile, CursorTilePosition, Layer);
-                            Console.Out.WriteLine("placed!");
 
                             SelectedTile = null;
                         }

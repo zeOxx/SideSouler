@@ -28,11 +28,11 @@ namespace SideSouler.Level
         #endregion
 
         #region Constructor
-        public TileSheet(Texture2D sheet, int sheetWidth, int sheetHeight, int tileSize, Vector2 offset)
+        public TileSheet(Texture2D sheet, int tileSize, Vector2 offset)
         {
             Texture = sheet;
-            SheetWidth = sheetWidth;
-            SheetHeight = sheetHeight;
+            SheetWidth = sheet.Width;
+            SheetHeight = sheet.Height;
             TileSize = tileSize;
 
             Offset = offset;

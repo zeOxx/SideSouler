@@ -133,8 +133,6 @@ namespace SideSouler.Level
                 case 2:
                     if (CurrentTileTwo < (Size.X * Size.Y))
                     {
-                        Console.Out.WriteLine(positionCheck(position, TilesLayerTwo));
-                        Console.Out.WriteLine(position);
                         if (!positionCheck(position, TilesLayerTwo))
                         {
                             TilesLayerTwo.Add(tempTile);

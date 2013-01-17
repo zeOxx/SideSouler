@@ -14,6 +14,7 @@ namespace SideSouler.Interface
         public int width;
         public int height;
         public Vector2 position;
+        private Vector2 origin;
 
         private int duration;       // In milliseconds
         private int fadeDuration;   // Also in millis
@@ -46,19 +47,19 @@ namespace SideSouler.Interface
 
         // Textvariables
         private string headerText;
-        private string text;
+        private List<string> text;
         private bool hasHeader;
-        private bool hasText;
+
+        private bool centered;
         #endregion
 
-        #region Constructor
-        public DialogBox(ContentManager content, Vector2 position, int w, int h, int duration, int fade, int margin)
+        #region Constructors
+        // Use this for un-centered (that's a word, right?) dialogboxes
+        public DialogBox(ContentManager content, Vector2 position, int w, int h, int margin)
         {
             Position        = position;
             Width           = w;
             Height          = h;
-            Duration        = duration;
-            FadeDuration    = fade;
 
             setupTextures(content);
             updateRectangles(margin);
@@ -67,6 +68,33 @@ namespace SideSouler.Interface
             TextFont    = content.Load<SpriteFont>("Fonts\\defaultFont");
 
             HasHeader = false;
+            Centered = false;
+
+            Text = new List<string>();
+        }
+
+        // Use this to get a centered dialogbox
+        public DialogBox(ContentManager content, int w, int h, int duration, int fade, int margin)
+        {
+            Position = Vector2.Zero;    // This could be anything since it will be taken care of in updateCenterPosition()
+
+            Width = w;
+            Height = h;
+            Duration = duration;
+            FadeDuration = fade;
+
+            Origin = new Vector2(Width / 2, Height / 2);
+
+            setupTextures(content);
+            updateRectangles(margin);
+
+            HeaderFont = content.Load<SpriteFont>("Fonts\\headerFont");
+            TextFont = content.Load<SpriteFont>("Fonts\\Verdana");
+
+            HasHeader = false;
+            Centered = true;
+
+            Text = new List<string>();
         }
         #endregion
 
@@ -87,6 +115,12 @@ namespace SideSouler.Interface
         {
             get { return this.position; }
             set { this.position = value; }
+        }
+
+        private Vector2 Origin
+        {
+            get { return this.origin; }
+            set { this.origin = value; }
         }
 
         private int Duration
@@ -227,7 +261,7 @@ namespace SideSouler.Interface
             set { this.headerText = value; }
         }
 
-        private string Text
+        private List<string> Text
         {
             get { return this.text; }
             set { this.text = value; }
@@ -239,10 +273,10 @@ namespace SideSouler.Interface
             set { this.hasHeader = value; }
         }
 
-        private bool HasText
+        public bool Centered
         {
-            get { return this.hasText; }
-            set { this.hasText = value; }
+            get { return this.centered; }
+            private set { this.centered = value; }
         }
         #endregion
 
@@ -260,9 +294,19 @@ namespace SideSouler.Interface
             TextureCenter = content.Load<Texture2D>("Interface\\boxFrameCenter");
         }
 
+        public void updateCenterPosition(Vector2 cameraPosition)
+        {
+            Position = new Vector2(cameraPosition.X - (Width / 2), cameraPosition.Y - (Height / 2));
+            Origin = cameraPosition;
+        }
+
         public void update(Vector2 cameraPosition, int margin)
         {
-            updatePosition(cameraPosition);
+            if (Centered)
+                updateCenterPosition(cameraPosition);
+            else
+                updatePosition(cameraPosition);
+
             updateRectangles(margin);
         }
 
@@ -291,16 +335,13 @@ namespace SideSouler.Interface
             HasHeader = true;
         }
 
-        public void setText(string text)
+        public void addText(string text)
         {
-            Text = text;
-
-            HasText = true;
+            Text.Add(text);
         }
 
         public void draw(SpriteBatch spriteBatch)
         {
-            // Draws the box
             spriteBatch.Draw(TextureCenter, BoxCenter, Color.White);
             spriteBatch.Draw(TextureFrameTop, BoxTop, Color.White);
             spriteBatch.Draw(TextureFrameBottom, BoxBottom, Color.White);
@@ -311,19 +352,26 @@ namespace SideSouler.Interface
             spriteBatch.Draw(TextureCorner3, BoxCorner3, Color.White);
             spriteBatch.Draw(TextureCorner4, BoxCorner4, Color.White);
 
-            Vector2 headerPosition;
-            headerPosition.X = Position.X + 5;
-            headerPosition.Y = Position.Y + 3;
-
             // Draws the text, if it is present
-            if (HeaderText != null)
+            if (HasHeader)
             {
+                Vector2 headerPosition;
+                headerPosition.X = Position.X + 10;
+                headerPosition.Y = Position.Y + 3;
+
                 spriteBatch.DrawString(HeaderFont, HeaderText, headerPosition, Color.White);
             }
 
-            if (Text != null)
+            int i = 0;
+            foreach (string s in Text)
             {
-                spriteBatch.DrawString(TextFont, Text, Position, Color.White);
+                Vector2 textPosition;
+                textPosition.X = Position.X + 10;
+                textPosition.Y = Position.Y + 20 + i;
+
+                spriteBatch.DrawString(TextFont, s, textPosition, Color.White);
+
+                i += 20;
             }
         }
         #endregion

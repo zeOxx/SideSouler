@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Interface\DialogBox.cs" />
+    <Compile Include="Interface\Element.cs" />
     <Compile Include="Interface\InfoText.cs" />
     <Compile Include="Level\Editor.cs" />
     <Compile Include="Level\EditorCamera.cs" />
@@ -120,6 +121,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Content\Fonts\headerFont.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Fonts\Verdana.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

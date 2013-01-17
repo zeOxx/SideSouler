@@ -27,6 +27,7 @@ namespace SideSouler.Level
         private DialogBox modeBox;
         private DialogBox coordBox;
         private InfoText tileText;
+        private DialogBox test;
 
         private Texture2D cursorCurrent;
         private Texture2D cursorMove;
@@ -39,19 +40,21 @@ namespace SideSouler.Level
 
         private TileSheet tilesheet;
         private Texture2D selectionRect;
-        private Vector2 selectionRectOffset;
         private Vector2 selectionRectPosition;
         private Vector2 tileSelect;
         private Tile selectedTile;
 
         public EditorCamera editorCamera;
 
+        private bool helpDiag;
+
         // TODO:
         //  Add other modes (NPC Mode etc)
         private enum Modes
         {
             Edit,
-            View
+            View,
+            Help
         }
 
         private Modes mode;
@@ -80,6 +83,8 @@ namespace SideSouler.Level
             TileText = new InfoText(content, "Tilesheet", new Vector2(370, -315));  // again, MAGIC NUMBERS!
 
             SelectedTile = null;
+
+            HelpDiag = false;
         }
         #endregion
 
@@ -209,6 +214,12 @@ namespace SideSouler.Level
             get { return this.editorCamera; }
             set { this.editorCamera = value; }
         }
+
+        private bool HelpDiag
+        {
+            get { return this.helpDiag; }
+            set { this.helpDiag = value; }
+        }
         #endregion
 
         #region Methods
@@ -228,23 +239,37 @@ namespace SideSouler.Level
 
         public void initDialogBoxes(ContentManager content, int screenWidth, int screenHeight)
         {
-            ModeBox = new DialogBox(content, new Vector2(screenWidth / 2 - 100, screenHeight - 20), 128, 24, 0, 0, Margin);
+            ModeBox = new DialogBox(content, new Vector2(screenWidth / 2 - 100, screenHeight - 20), 128, 24, Margin);
             ModeBox.setHeaderText("View Mode");
 
-            TopBox = new DialogBox(content, new Vector2(Margin, Margin), screenWidth - (Margin * 2), 25, 0, 0, Margin);
+            TopBox = new DialogBox(content, new Vector2(Margin, Margin), screenWidth - (Margin * 2), 25, Margin);
             TopBox.setHeaderText("Editor   -   Layer: " + Layer);
 
-            RightBox = new DialogBox(content, new Vector2(screenWidth - 230, 30), 286, 687, 0, 0, Margin);
+            RightBox = new DialogBox(content, new Vector2(screenWidth - 230, 30), 286, 687, Margin);
 
-            CoordBox = new DialogBox(content, Vector2.Zero, 128, 24, 0, 0, Margin);
+            CoordBox = new DialogBox(content, Vector2.Zero, 128, 24, Margin);
             CoordBox.setHeaderText("X: Y:");
+
+            test = new DialogBox(content, 450, 250, 100, 123, Margin);
+            test.addText("                      HELP");
+            test.addText("");
+            test.addText("  All Modes");
+            test.addText("Switch modes - Tab");
+            test.addText("Move camera - Hold space");
+            test.addText("Change layers - Scrollwheel");
+            test.addText("");
+            test.addText("  Edit Mode");
+            test.addText("Add tiles - Left mousebutton");
+            test.addText("Remove tiles - Right mousebutton");
         }
 
         public void update(ContentManager content, InputHandler inputHandler)
         {
             /* Changing modes */
             if (inputHandler.keyReleased(Keys.Tab))
-                changeMode();
+                changeMode(false);
+            if (inputHandler.keyReleased(Keys.F1))
+                changeMode(true);
 
             /* Changing Layers */
             layerChecker(inputHandler);
@@ -267,66 +292,76 @@ namespace SideSouler.Level
 
             updateHudPosition();
 
+            switch (mode)
+            {
+                case Modes.Edit:
+                    CursorTilePosition = inputHandler.mousePosition();
+                    CursorTilePosition = Vector2.Transform(CursorTilePosition, editorCamera.getInverseTransform());
+
+                    float overX = CursorTilePosition.X % 32;
+                    float overY = CursorTilePosition.Y % 32;
+
+                    CursorTilePosition -= new Vector2(overX, overY);
+
+                    /* Editing tilemap */
+                    if (clickOnHud(inputHandler.mousePosition()))
+                    {
+                        #region Choosing tiles and other HUD stuff
+                        if (inputHandler.leftClicked())
+                        {
+                            // The tilesheet is located at (1010, 70).
+                            //  ((640 + 370), (360 - 290))
+                            //  THERE ARE WAY TOO MANY NUMBERS HERE. 
+                            //  GET THIS SHIT IN ORDER
+                            if (((inputHandler.mousePosition().X > 1010) && (inputHandler.mousePosition().X < (1010 + Tilesheet.SheetWidth)))
+                                && ((inputHandler.mousePosition().Y > 70) && (inputHandler.mousePosition().Y < (70 + Tilesheet.SheetHeight))))
+                            {
+                                tileSelect = new Vector2(   ((inputHandler.mousePosition().X - ((inputHandler.mousePosition().X - 1010) % 32)) - 1010), 
+                                                                    ((inputHandler.mousePosition().Y - ((inputHandler.mousePosition().Y - 70) % 32)) - 70));
+
+                                SelectionRectPosition = Tilesheet.Position + tileSelect;
+
+                                SelectedTile = Tilesheet.getTile(((int)tileSelect.X / Tilesheet.TileSize), ((int)tileSelect.Y / Tilesheet.TileSize));
+                            }
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        #region Placing and removing tiles
+                        // Adding tiles:
+                        if (inputHandler.leftClicked())
+                        {
+                            if (SelectedTile != null)
+                            {
+                                SelectedTile.setPosition(CursorTilePosition);
+                                currentLevel.placeTile(SelectedTile, CursorTilePosition, Layer);
+
+                                SelectedTile = null;
+                            }
+
+                            if (SelectedTile == null)
+                            {
+                                SelectedTile = Tilesheet.getTile(((int)tileSelect.X / Tilesheet.TileSize), ((int)tileSelect.Y / Tilesheet.TileSize));
+                            }
+                        }
+
+                        // Removing tiles:
+                        if (inputHandler.rightClicked())
+                        {
+                            currentLevel.removeTileCheck(CursorTilePosition, Layer);
+                        }
+                        #endregion
+                    }
+                    break;
+                case Modes.View:
+                    break;
+                case Modes.Help:
+                    break;
+            }
             if (mode == Modes.Edit)
             {
-                CursorTilePosition = inputHandler.mousePosition();
-                CursorTilePosition = Vector2.Transform(CursorTilePosition, editorCamera.getInverseTransform());
 
-                float overX = CursorTilePosition.X % 32;
-                float overY = CursorTilePosition.Y % 32;
-
-                CursorTilePosition -= new Vector2(overX, overY);
-
-                /* Editing tilemap */
-                if (clickOnHud(inputHandler.mousePosition()))
-                {
-                    #region Choosing tiles and other HUD stuff
-                    if (inputHandler.leftClicked())
-                    {
-                        // The tilesheet is located at (1010, 70).
-                        //  ((640 + 370), (360 - 290))
-                        //  THERE ARE WAY TOO MANY NUMBERS HERE. 
-                        //  GET THIS SHIT IN ORDER
-                        if (((inputHandler.mousePosition().X > 1010) && (inputHandler.mousePosition().X < (1010 + Tilesheet.SheetWidth)))
-                            && ((inputHandler.mousePosition().Y > 70) && (inputHandler.mousePosition().Y < (70 + Tilesheet.SheetHeight))))
-                        {
-                            tileSelect = new Vector2(   ((inputHandler.mousePosition().X - ((inputHandler.mousePosition().X - 1010) % 32)) - 1010), 
-                                                                ((inputHandler.mousePosition().Y - ((inputHandler.mousePosition().Y - 70) % 32)) - 70));
-
-                            SelectionRectPosition = Tilesheet.Position + tileSelect;
-
-                            SelectedTile = Tilesheet.getTile(((int)tileSelect.X / Tilesheet.TileSize), ((int)tileSelect.Y / Tilesheet.TileSize));
-                        }
-                    }
-                    #endregion
-                }
-                else
-                {
-                    #region Placing and removing tiles
-                    // Adding tiles:
-                    if (inputHandler.leftClicked())
-                    {
-                        if (SelectedTile != null)
-                        {
-                            SelectedTile.setPosition(CursorTilePosition);
-                            currentLevel.placeTile(SelectedTile, CursorTilePosition, Layer);
-
-                            SelectedTile = null;
-                        }
-
-                        if (SelectedTile == null)
-                        {
-                            SelectedTile = Tilesheet.getTile(((int)tileSelect.X / Tilesheet.TileSize), ((int)tileSelect.Y / Tilesheet.TileSize));
-                        }
-                    }
-
-                    // Removing tiles:
-                    if (inputHandler.rightClicked())
-                    {
-                        currentLevel.removeTileCheck(CursorTilePosition, Layer);
-                    }
-                    #endregion
-                }
             }
         }
 
@@ -345,16 +380,27 @@ namespace SideSouler.Level
         }
 
         // Changes the mode in the editor
-        private void changeMode()
+        private void changeMode(bool help)
         {
-            if (mode == Modes.Edit){
-                ModeBox.setHeaderText("View Mode");
-                mode = Modes.View;
-            }
-            else if (mode == Modes.View)
+            if (!help)
             {
-                ModeBox.setHeaderText("Edit Mode");
-                mode = Modes.Edit;
+                if (mode == Modes.Edit)
+                {
+                    ModeBox.setHeaderText("View Mode");
+                    mode = Modes.View;
+                }
+                else if (mode == Modes.View)
+                {
+                    ModeBox.setHeaderText("Edit Mode");
+                    mode = Modes.Edit;
+                }
+            }
+            else
+            {
+                if (HelpDiag)
+                    HelpDiag = false;
+                else
+                    HelpDiag = true;
             }
         }
 
@@ -398,6 +444,9 @@ namespace SideSouler.Level
             Tilesheet.update(new Vector2(editorCamera.Position.X, editorCamera.Position.Y));
 
             SelectionRectPosition = Tilesheet.Position + TileSelect;
+
+            if (HelpDiag)
+                test.update(editorCamera.Position, Margin);
         }
 
         public void draw(SpriteBatch spriteBatch)
@@ -451,6 +500,9 @@ namespace SideSouler.Level
             Tilesheet.draw(spriteBatch);
 
             spriteBatch.Draw(SelectionRect, SelectionRectPosition, Color.White);
+
+            if (HelpDiag)
+                test.draw(spriteBatch);
 
             spriteBatch.Draw(CursorCurrent, CursorPosition, Color.White);
         }

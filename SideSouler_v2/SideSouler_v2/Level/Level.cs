@@ -1,4 +1,15 @@
-﻿#region Using Statements
+﻿/************************************************************
+ * SideSouler v2                                            *
+ ************************************************************
+ *  Level.cs                                                *
+ * This class handles everything that a level can hold.     *
+ * Right now the code is very badly commented,              *
+ * sorry :(                                                 *
+ ************************************************************
+ * By Inge Dalby, 2014                                      *
+ ************************************************************/
+
+#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Linq;

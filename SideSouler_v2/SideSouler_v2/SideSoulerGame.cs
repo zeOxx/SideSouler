@@ -1,4 +1,13 @@
-﻿#region Using Statements
+﻿/************************************************************
+ * SideSouler v2                                            *
+ ************************************************************
+ *  SideSoulerGame.cs                                       *
+ * Core class that handles pretty much everything! :D       *
+ ************************************************************
+ * By Inge Dalby, 2014                                      *
+ ************************************************************/
+
+#region Using Statements
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;

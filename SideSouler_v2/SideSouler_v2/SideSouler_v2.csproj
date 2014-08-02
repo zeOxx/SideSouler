@@ -35,6 +35,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Player\Item.cs" />
+    <Compile Include="Player\Player.cs" />
     <Compile Include="Interface\DialogBox.cs" />
     <Compile Include="Interface\Element.cs" />
     <Compile Include="Interface\InfoText.cs" />

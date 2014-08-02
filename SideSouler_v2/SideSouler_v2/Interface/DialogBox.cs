@@ -1,4 +1,14 @@
-﻿using System;
+﻿/************************************************************
+ * SideSouler v2                                            *
+ ************************************************************
+ *  DialogBox.cs                                            *
+ * Class handling dialogboxes of any kind.                  *
+ * Very limited in it's current state.                      *
+ ************************************************************
+ * By Inge Dalby, 2014                                      *
+ ************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

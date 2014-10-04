@@ -15,17 +15,21 @@ namespace SideSouler_v2.Interface
         #region Fields
         private enum MenuType { MAIN, OPTIONS, PAUSE, CREDITS };
         MenuType menuType;
+
+        List<MenuButton> menuButtonList;
         #endregion
 
         #region Constructor
         public MenuScreen(ContentManager content, String type)
         {
             setMenuType(type);
+
+            menuButtonList = new List<MenuButton>();
         }
         #endregion
 
         #region Methods
-        // Class that parses the string 'type' into a valid MenuType.
+        // Method that parses the string 'type' into a valid MenuType.
         // If 'type' is invalid, an error is printed in console and the
         //  application quits when escape is pressed (not yet implemented)
         private void setMenuType(string type)
@@ -36,6 +40,12 @@ namespace SideSouler_v2.Interface
             /*else
                 IMPLEMENT ERROR CLASS AND PRINT TO CONSOLE
              */
+        }
+
+        // This method will add MenuButton objects into the list
+        public void addMenuButton(MenuButton button)
+        {
+            menuButtonList.Add(button);
         }
         #endregion
     }

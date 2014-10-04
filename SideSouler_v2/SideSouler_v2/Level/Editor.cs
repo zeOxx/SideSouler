@@ -49,7 +49,7 @@ namespace SideSouler_v2.Level
         private bool helpDiag;
 
         // TODO:
-        //  Add other modes (NPC Mode etc)
+        //  Add other modes (Object Mode etc)
         private enum Modes
         {
             Edit,

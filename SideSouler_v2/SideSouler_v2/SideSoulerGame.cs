@@ -25,6 +25,7 @@ namespace SideSouler_v2
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Level.Editor editor;
+        Interface.MenuScreen menuScreen;
         Systems.InputHandler inputHandler;
 
         // Window variables
@@ -37,6 +38,9 @@ namespace SideSouler_v2
         private int frames;
         private float elapsed;
         private float totalElapsed;
+
+        private enum GameState { MAINMENU, GAME, EDITOR };
+        GameState gameState = GameState.EDITOR;
 
         public SideSoulerGame()
             : base()
@@ -62,6 +66,8 @@ namespace SideSouler_v2
         {
             editor = new Level.Editor(GraphicsDevice.Viewport, Content, width, height);
             inputHandler = new Systems.InputHandler();
+
+            menuScreen = new Interface.MenuScreen(Content);
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -89,7 +95,15 @@ namespace SideSouler_v2
                 Exit();
 
             inputHandler.update();
-            editor.update(Content, inputHandler);
+
+            if (gameState == GameState.MAINMENU)
+            {
+                //menuScreen.update();
+            }
+            else if (gameState == GameState.EDITOR)
+            {
+                editor.update(Content, inputHandler);
+            }
 
             elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             totalElapsed += elapsed;
@@ -108,7 +122,14 @@ namespace SideSouler_v2
                 SamplerState.LinearWrap,
                 DepthStencilState.Default,
                 RasterizerState.CullNone, null, editor.EditorCamera.getTransformation());
-            editor.draw(spriteBatch);
+            if (gameState == GameState.MAINMENU)
+            {
+                //menuScreen.draw(spriteBatch);
+            }
+            else if (gameState == GameState.EDITOR)
+            {
+                editor.draw(spriteBatch);
+            }
             spriteBatch.End();
 
             base.Draw(gameTime);
